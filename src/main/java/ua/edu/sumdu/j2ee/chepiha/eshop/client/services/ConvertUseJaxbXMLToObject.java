@@ -1,8 +1,6 @@
 package ua.edu.sumdu.j2ee.chepiha.eshop.client.services;
 
 import org.springframework.stereotype.Service;
-import ua.edu.sumdu.j2ee.chepiha.eshop.client.entities.xml.Currency;
-import ua.edu.sumdu.j2ee.chepiha.eshop.client.entities.xml.Exchange;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -15,14 +13,15 @@ import java.io.StringReader;
 
 @Service
 public class ConvertUseJaxbXMLToObject<T> {
-    public T convert(String dataXML, T entity) throws JAXBException, XMLStreamException, IOException {
+    public T convert(String dataXML, T entity, Class parent, Class child)
+            throws JAXBException, XMLStreamException, IOException {
 
         System.out.println("ConvertUseJaxbXMLToObject.convert :: start....");
         System.out.println("ConvertUseJaxbXMLToObject.convert :: data length :: " + dataXML.length());
 
         System.out.println("ConvertUseJaxbXMLToObject.convert :: empty result :: " + entity);
 
-        JAXBContext jaxbContext = JAXBContext.newInstance(Exchange.class, Currency.class);
+        JAXBContext jaxbContext = JAXBContext.newInstance(parent, child);
 
         System.out.println("ConvertUseJaxbXMLToObject.convert :: Create JAXBContext.newInstance");
 

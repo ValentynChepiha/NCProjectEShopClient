@@ -58,7 +58,9 @@ public class CurrencyExchangeRepository implements ModelRepository<CurrencyExcha
     }
 
     public Integer checkLastDateUpdate() {
-        String sql = "SELECT case when (to_char(MAX(EXCHANGEDATE), 'ddmmyyyy') = to_char(sysdate, 'ddmmyyyy')) then 1 else -1 end  FROM LAB4_CHEPIHAVV_CURRENCY_EXCHANGE";
+        String sql = "SELECT case when (to_date(to_char(MAX(EXCHANGEDATE), 'ddmmyyyy'), 'ddmmyyyy') " +
+                ">= to_date(to_char(sysdate, 'ddmmyyyy'), 'ddmmyyyy')) then 1 else -1 end " +
+                " FROM LAB4_CHEPIHAVV_CURRENCY_EXCHANGE";
         return jdbcTemplate.queryForObject(sql, Integer.class);
     }
 

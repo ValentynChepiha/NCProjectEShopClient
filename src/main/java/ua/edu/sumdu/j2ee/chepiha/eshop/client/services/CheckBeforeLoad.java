@@ -15,27 +15,31 @@ public class CheckBeforeLoad {
     @Autowired
     private CurrencyExchangeRepository currencyExchangeRepository;
     @Autowired
-    private LoadCurrencyService loadCurrencyService;
+    private LoadExchangeService loadExchangeService;
     @Autowired
     private LoadXMLService<Exchange> loadXMLService;
 
     public void checkUpdateExchangeRate() {
 
-        if (currencyExchangeRepository.checkLastDateUpdate()>0) {
+        if (currencyExchangeRepository.checkLastDateUpdate() > 0) {
             return;
         }
 
-        System.out.println("checkUpdate :: start...");
+        System.out.println("CheckBeforeLoad.checkUpdate :: start...");
         Exchange exchange = new Exchange();
-        exchange = loadXMLService.convertStringXMLToObject( loadCurrencyService.loadCurrency(), exchange );
+        exchange = loadXMLService.convertStringXMLToObject(
+                loadExchangeService.loadCurrency(),
+                exchange,
+                Exchange.class,
+                Currency.class);
 
-        System.out.println("checkUpdate :: loaded " + exchange.size() + " rows");
+        System.out.println("CheckBeforeLoad.checkUpdate :: loaded " + exchange.size() + " rows");
         if(exchange.size()==0){
             return;
         }
 
-        Exchange exchangeFiltered = loadCurrencyService.filterListCurrency(exchange);
-        System.out.println("checkUpdate :: filtered " + exchangeFiltered.size() + " rows");
+        Exchange exchangeFiltered = loadExchangeService.filterListCurrency(exchange);
+        System.out.println("CheckBeforeLoad.checkUpdate :: filtered " + exchangeFiltered.size() + " rows");
 
         try {
             for(Currency currency: exchangeFiltered.getCurrencies()) {

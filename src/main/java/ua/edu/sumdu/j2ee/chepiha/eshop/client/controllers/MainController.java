@@ -5,12 +5,15 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import ua.edu.sumdu.j2ee.chepiha.eshop.client.services.CheckBeforeLoad;
+import ua.edu.sumdu.j2ee.chepiha.eshop.client.services.LoadGoodsService;
 
 @Controller
 public class MainController {
 
     @Autowired
     CheckBeforeLoad checkBeforeLoad;
+    @Autowired
+    LoadGoodsService loadGoodsService;
 
     // todo:
     //        example
@@ -20,7 +23,7 @@ public class MainController {
     public String mainGet(Model model) {
         checkBeforeLoad.checkUpdateExchangeRate();
 
-
+        model.addAttribute("goods", loadGoodsService.load());
 
         return "welcome";
     }

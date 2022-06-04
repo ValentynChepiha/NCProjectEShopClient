@@ -13,15 +13,15 @@ public class LoadXMLService<T> {
     @Autowired
     ConvertUseJaxbXMLToObject<T> convertUseJaxbXMLToObject;
 
-    public T convertStringXMLToObject(String dataXML, T entity) {
+    public T convertStringXMLToObject(String dataXML, T entity, Class parent, Class child) {
 
         if(dataXML.length() == 0){
             return null;
         }
 
         try {
-            entity = convertUseJaxbXMLToObject.convert(dataXML, entity);
-            System.out.println("convertStringXMLToObject :: dataCurrency :: " + entity );
+            entity = convertUseJaxbXMLToObject.convert(dataXML, entity, parent, child);
+            System.out.println("convertStringXMLToObject :: loaded :: " + entity );
             return entity;
         } catch (JAXBException e) {
             e.printStackTrace();

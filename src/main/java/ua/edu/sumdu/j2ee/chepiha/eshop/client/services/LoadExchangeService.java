@@ -8,16 +8,12 @@ import ua.edu.sumdu.j2ee.chepiha.eshop.client.entities.xml.Currency;
 import ua.edu.sumdu.j2ee.chepiha.eshop.client.entities.xml.Exchange;
 import ua.edu.sumdu.j2ee.chepiha.eshop.client.repositories.DCurrencyRepository;
 
-import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 @Service
-public class LoadCurrencyService {
+public class LoadExchangeService {
 
     @Autowired
     private DCurrencyRepository dCurrencyRepository;
