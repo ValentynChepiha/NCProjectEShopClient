@@ -1,23 +1,28 @@
 package ua.edu.sumdu.j2ee.chepiha.eshop.client.services;
 
-import ua.edu.sumdu.j2ee.chepiha.eshop.client.entities.xml.Exchange;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 
-public class XMLService {
+@Service
+public class LoadXMLService<T> {
 
-    public static Exchange convertStringXMLToObject(String dataXML) {
+    @Autowired
+    ConvertUseJaxbXMLToObject<T> convertUseJaxbXMLToObject;
+
+    public T convertStringXMLToObject(String dataXML, T entity) {
 
         if(dataXML.length() == 0){
             return null;
         }
 
         try {
-            Exchange exchange = ConvertUseJaxbXMLToObject.convert(dataXML);
-            System.out.println("convertStringXMLToObject :: dataCurrency :: " + exchange );
-            return exchange;
+            entity = convertUseJaxbXMLToObject.convert(dataXML, entity);
+            System.out.println("convertStringXMLToObject :: dataCurrency :: " + entity );
+            return entity;
         } catch (JAXBException e) {
             e.printStackTrace();
         } catch (XMLStreamException e) {

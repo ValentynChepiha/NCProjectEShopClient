@@ -1,5 +1,6 @@
 package ua.edu.sumdu.j2ee.chepiha.eshop.client.services;
 
+import org.springframework.stereotype.Service;
 import ua.edu.sumdu.j2ee.chepiha.eshop.client.entities.xml.Currency;
 import ua.edu.sumdu.j2ee.chepiha.eshop.client.entities.xml.Exchange;
 
@@ -12,14 +13,14 @@ import javax.xml.stream.XMLStreamReader;
 import java.io.IOException;
 import java.io.StringReader;
 
-public class ConvertUseJaxbXMLToObject {
-    public static Exchange convert(String dataXML) throws JAXBException, XMLStreamException, IOException {
+@Service
+public class ConvertUseJaxbXMLToObject<T> {
+    public T convert(String dataXML, T entity) throws JAXBException, XMLStreamException, IOException {
 
         System.out.println("ConvertUseJaxbXMLToObject.convert :: start....");
         System.out.println("ConvertUseJaxbXMLToObject.convert :: data length :: " + dataXML.length());
-        Exchange exchange = new Exchange();
 
-        System.out.println("ConvertUseJaxbXMLToObject.convert :: empty result :: " + exchange);
+        System.out.println("ConvertUseJaxbXMLToObject.convert :: empty result :: " + entity);
 
         JAXBContext jaxbContext = JAXBContext.newInstance(Exchange.class, Currency.class);
 
@@ -37,10 +38,10 @@ public class ConvertUseJaxbXMLToObject {
         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
         System.out.println("ConvertUseJaxbXMLToObject.convert :: Create jaxbContext.createUnmarshaller");
 
-        exchange = (Exchange) jaxbUnmarshaller.unmarshal(xsr);
+        entity = (T) jaxbUnmarshaller.unmarshal(xsr);
         System.out.println("ConvertUseJaxbXMLToObject.convert :: Unmarshal result" );
-        System.out.println("ConvertUseJaxbXMLToObject.convert :: Rows :: " + exchange.size());
+        System.out.println("ConvertUseJaxbXMLToObject.convert :: " + entity);
 
-        return exchange;
+        return entity;
     }
 }

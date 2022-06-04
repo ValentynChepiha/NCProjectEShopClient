@@ -41,10 +41,8 @@ public class Exchange {
         }
 
         StringBuilder currenciesString = new StringBuilder();
-        if(currencies != null){
-            for(Currency currency: currencies){
-                currenciesString.append(currency.toString());
-            }
+        for(Currency currency: currencies){
+            currenciesString.append(currency.toString());
         }
 
         return "Exchange {" +

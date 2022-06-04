@@ -16,6 +16,8 @@ public class CheckBeforeLoad {
     private CurrencyExchangeRepository currencyExchangeRepository;
     @Autowired
     private LoadCurrencyService loadCurrencyService;
+    @Autowired
+    private LoadXMLService<Exchange> loadXMLService;
 
     public void checkUpdateExchangeRate() {
 
@@ -24,7 +26,8 @@ public class CheckBeforeLoad {
         }
 
         System.out.println("checkUpdate :: start...");
-        Exchange exchange = XMLService.convertStringXMLToObject( loadCurrencyService.loadCurrency() );
+        Exchange exchange = new Exchange();
+        exchange = loadXMLService.convertStringXMLToObject( loadCurrencyService.loadCurrency(), exchange );
 
         System.out.println("checkUpdate :: loaded " + exchange.size() + " rows");
         if(exchange.size()==0){

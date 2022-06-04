@@ -2,6 +2,7 @@ package ua.edu.sumdu.j2ee.chepiha.eshop.client.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ua.edu.sumdu.j2ee.chepiha.eshop.client.config.ConfigUrl;
 import ua.edu.sumdu.j2ee.chepiha.eshop.client.entities.db.DCurrency;
 import ua.edu.sumdu.j2ee.chepiha.eshop.client.entities.xml.Currency;
 import ua.edu.sumdu.j2ee.chepiha.eshop.client.entities.xml.Exchange;
@@ -22,32 +23,7 @@ public class LoadCurrencyService {
     private DCurrencyRepository dCurrencyRepository;
 
     public String loadCurrency() {
-
-        String url = "https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?xml";
-        String result = "";
-
-        try {
-            //Open the URLConnection for reading
-            URL u = new URL(url);
-            URLConnection uc = u.openConnection();
-            InputStream raw = uc.getInputStream();
-            InputStream buffer = new BufferedInputStream(raw);
-
-            // chain the InputStream to a Reader
-            Reader r = new InputStreamReader(buffer);
-            int c;
-            StringBuffer stringBuffer = new StringBuffer();
-            while ((c = r.read(  )) != -1) {
-                stringBuffer.append((char) c);
-            }
-            result = stringBuffer.toString();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            return result;
-        }
+        return LoadService.load( ConfigUrl.URLLoadExchangeRate );
     }
 
     public Exchange filterListCurrency(Exchange dataExchange) {

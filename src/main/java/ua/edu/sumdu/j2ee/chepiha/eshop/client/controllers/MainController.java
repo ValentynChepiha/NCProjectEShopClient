@@ -19,6 +19,9 @@ public class MainController {
     @GetMapping("/")
     public String mainGet(Model model) {
         checkBeforeLoad.checkUpdateExchangeRate();
+
+
+
         return "welcome";
     }
 
