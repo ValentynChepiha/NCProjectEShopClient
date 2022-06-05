@@ -3,9 +3,11 @@ package ua.edu.sumdu.j2ee.chepiha.eshop.client.services;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ua.edu.sumdu.j2ee.chepiha.eshop.client.config.ConfigUrl;
+import ua.edu.sumdu.j2ee.chepiha.eshop.client.entities.db.CurrencyRate;
 import ua.edu.sumdu.j2ee.chepiha.eshop.client.entities.db.DCurrency;
 import ua.edu.sumdu.j2ee.chepiha.eshop.client.entities.xml.Currency;
 import ua.edu.sumdu.j2ee.chepiha.eshop.client.entities.xml.Exchange;
+import ua.edu.sumdu.j2ee.chepiha.eshop.client.repositories.CurrencyRateRepository;
 import ua.edu.sumdu.j2ee.chepiha.eshop.client.repositories.DCurrencyRepository;
 
 import java.util.HashSet;
@@ -17,18 +19,32 @@ public class LoadExchangeService {
 
     @Autowired
     private DCurrencyRepository dCurrencyRepository;
+    @Autowired
+    private CurrencyRateRepository currencyRateRepository;
 
     public String loadCurrency() {
         return LoadService.load( ConfigUrl.URLLoadExchangeRate );
     }
 
+    public List<CurrencyRate> loadCurrencyRate() {
+        return currencyRateRepository.findActualExchange();
+    }
+
+    public float getSelectedCurrencyRate (String cc) {
+
+        List<CurrencyRate> currencyRateList = loadCurrencyRate();
+        float result = 1;
+
+        for(CurrencyRate currencyRate: currencyRateList) {
+            if( currencyRate.getCc().equals(cc) ){
+                result = (float) currencyRate.getRate();
+            }
+        }
+
+        return result;
+    }
+
     public Exchange filterListCurrency(Exchange dataExchange) {
-
-//        Integer[] arrayCurrencyNeed = (Integer[]) dCurrencyRepository.findAllR030().toArray();
-//        System.out.println( " load array :: " + arrayCurrencyNeed);
-
-//        Set<Integer> currencyNeed = new HashSet<>(Arrays.asList( arrayCurrencyNeed ));
-
         System.out.println("filterListCurrency :: start...");
         System.out.println("filterListCurrency :: come dataExchange " +  dataExchange.size() + " rows");
 
@@ -48,7 +64,6 @@ public class LoadExchangeService {
                 resultExchange.addCurrency(currency);
             }
         }
-
         return resultExchange;
     }
 

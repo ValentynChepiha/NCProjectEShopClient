@@ -5,13 +5,13 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.stereotype.Repository;
 import ua.edu.sumdu.j2ee.chepiha.eshop.client.entities.db.CurrencyExchange;
-import ua.edu.sumdu.j2ee.chepiha.eshop.client.interfaces.ModelRepository;
+import ua.edu.sumdu.j2ee.chepiha.eshop.client.entities.db.CurrencyRate;
+import ua.edu.sumdu.j2ee.chepiha.eshop.client.interfaces.ModelExchangeRepository;
 
-import java.sql.Date;
 import java.util.List;
 
 @Repository
-public class CurrencyExchangeRepository implements ModelRepository<CurrencyExchange> {
+public class CurrencyExchangeRepository implements ModelExchangeRepository<CurrencyExchange> {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -52,11 +52,7 @@ public class CurrencyExchangeRepository implements ModelRepository<CurrencyExcha
         return  jdbcTemplate.queryForObject (sql, new BeanPropertyRowMapper<>(CurrencyExchange.class), r030);
     }
 
-    public Date getLastUpdate() {
-        String sql = "select max(exchangedate) exchangedate from lab4_chepihavv_currency_exchange";
-        return jdbcTemplate.queryForObject(sql, Date.class);
-    }
-
+    @Override
     public Integer checkLastDateUpdate() {
         String sql = "SELECT case when (to_date(to_char(MAX(EXCHANGEDATE), 'ddmmyyyy'), 'ddmmyyyy') " +
                 ">= to_date(to_char(sysdate, 'ddmmyyyy'), 'ddmmyyyy')) then 1 else -1 end " +
