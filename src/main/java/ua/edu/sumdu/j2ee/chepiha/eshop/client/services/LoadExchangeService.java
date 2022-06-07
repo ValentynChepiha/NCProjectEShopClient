@@ -2,7 +2,7 @@ package ua.edu.sumdu.j2ee.chepiha.eshop.client.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ua.edu.sumdu.j2ee.chepiha.eshop.client.config.ConfigUrl;
+import ua.edu.sumdu.j2ee.chepiha.eshop.client.config.ConfigApp;
 import ua.edu.sumdu.j2ee.chepiha.eshop.client.entities.db.CurrencyRate;
 import ua.edu.sumdu.j2ee.chepiha.eshop.client.entities.db.DCurrency;
 import ua.edu.sumdu.j2ee.chepiha.eshop.client.entities.xml.Currency;
@@ -17,13 +17,15 @@ import java.util.Set;
 @Service
 public class LoadExchangeService {
 
+    private static final LoggerMsgService logger = new LoggerMsgService(LoadExchangeService.class) ;
+
     @Autowired
     private DCurrencyRepository dCurrencyRepository;
     @Autowired
     private CurrencyRateRepository currencyRateRepository;
 
     public String loadCurrency() {
-        return LoadService.load( ConfigUrl.URLLoadExchangeRate );
+        return LoadService.load( ConfigApp.URL_LOAD_EXCHANGE_RATE);
     }
 
     public List<CurrencyRate> loadCurrencyRate() {
@@ -32,38 +34,40 @@ public class LoadExchangeService {
 
     public float getSelectedCurrencyRate (String cc) {
 
+        logger.msgDebug("getSelectedCurrencyRate: input data - " + cc);
         List<CurrencyRate> currencyRateList = loadCurrencyRate();
         float result = 1;
 
+        logger.msgDebug("getSelectedCurrencyRate: load list - " + currencyRateList);
         for(CurrencyRate currencyRate: currencyRateList) {
             if( currencyRate.getCc().equals(cc) ){
                 result = (float) currencyRate.getRate();
             }
         }
 
+        logger.msgDebug("getSelectedCurrencyRate: result rate - " + result);
         return result;
     }
 
     public Exchange filterListCurrency(Exchange dataExchange) {
-        System.out.println("filterListCurrency :: start...");
-        System.out.println("filterListCurrency :: come dataExchange " +  dataExchange.size() + " rows");
+        logger.msgDebug("filterListCurrency: input data - " + dataExchange);
 
         List<DCurrency> dCurrencyList = dCurrencyRepository.findAll();
-        System.out.println("filterListCurrency :: need R030 " +  dCurrencyList);
+        logger.msgDebug("filterListCurrency: need code R030 - " +  dCurrencyList);
 
         Set<Integer> currencyNeed = new HashSet<>();
         for(DCurrency dCurrency: dCurrencyList){
             currencyNeed.add(dCurrency.getR030());
         }
 
-        System.out.println("filterListCurrency :: added currencyNeed " +  currencyNeed.size() + " rows");
-
+        logger.msgDebug("filterListCurrency: currencyNeed - " +  currencyNeed);
         Exchange resultExchange = new Exchange();
         for (Currency currency: dataExchange.getCurrencies()) {
             if( currencyNeed.contains(currency.getR030())){
                 resultExchange.addCurrency(currency);
             }
         }
+        logger.msgDebug("filterListCurrency: currencyNeed - " +  resultExchange);
         return resultExchange;
     }
 

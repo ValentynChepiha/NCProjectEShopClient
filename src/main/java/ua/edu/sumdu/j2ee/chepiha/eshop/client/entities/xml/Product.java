@@ -103,6 +103,11 @@ public class Product {
         this.nameGift = nameGift;
     }
 
+    public float getAmount(int count) {
+        // todo:
+        return ((float) Math.round(getPrice() * 100 * count)) / 100;
+    }
+
     @Override
     public String toString() {
         return "Product{" +

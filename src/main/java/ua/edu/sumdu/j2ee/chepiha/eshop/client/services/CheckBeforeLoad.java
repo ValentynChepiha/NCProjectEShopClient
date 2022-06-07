@@ -12,6 +12,8 @@ import java.text.ParseException;
 @Service
 public class CheckBeforeLoad {
 
+    private static final LoggerMsgService logger = new LoggerMsgService(CheckBeforeLoad.class) ;
+
     @Autowired
     private CurrencyExchangeRepository currencyExchangeRepository;
     @Autowired
@@ -20,6 +22,10 @@ public class CheckBeforeLoad {
     private LoadXMLService<Exchange> loadXMLService;
 
     public void checkUpdateExchangeRate() {
+
+        // todo:
+        //      do it in all services
+        logger.msgDebug("checkUpdateExchangeRate start...");
 
         if (currencyExchangeRepository.checkLastDateUpdate() > 0) {
             return;

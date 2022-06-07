@@ -13,33 +13,24 @@ import java.io.StringReader;
 
 @Service
 public class ConvertUseJaxbXMLToObject<T> {
+
+    private static final LoggerMsgService logger = new LoggerMsgService(ConvertUseJaxbXMLToObject.class) ;
+
     public T convert(String dataXML, T entity, Class parent, Class child)
             throws JAXBException, XMLStreamException, IOException {
 
-        System.out.println("ConvertUseJaxbXMLToObject.convert :: start....");
-        System.out.println("ConvertUseJaxbXMLToObject.convert :: data length :: " + dataXML.length());
-
-        System.out.println("ConvertUseJaxbXMLToObject.convert :: empty result :: " + entity);
+        logger.msgDebug("convert :: start....");
+        logger.msgDebug("convert :: data length - " + dataXML.length());
+        logger.msgDebug("convert :: data - " + dataXML);
+        logger.msgDebug("ConvertUseJaxbXMLToObject.convert :: empty result - " + entity);
 
         JAXBContext jaxbContext = JAXBContext.newInstance(parent, child);
-
-        System.out.println("ConvertUseJaxbXMLToObject.convert :: Create JAXBContext.newInstance");
-
         XMLInputFactory xif = XMLInputFactory.newFactory();
-        System.out.println("ConvertUseJaxbXMLToObject.convert :: Create XMLInputFactory.newFactory");
-
         xif.setProperty(XMLInputFactory.SUPPORT_DTD, false);
-        System.out.println("ConvertUseJaxbXMLToObject.convert :: Off dtd");
-
         XMLStreamReader xsr = xif.createXMLStreamReader(new StringReader(dataXML));
-        System.out.println("ConvertUseJaxbXMLToObject.convert :: Read stream ");
-
         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-        System.out.println("ConvertUseJaxbXMLToObject.convert :: Create jaxbContext.createUnmarshaller");
-
         entity = (T) jaxbUnmarshaller.unmarshal(xsr);
-        System.out.println("ConvertUseJaxbXMLToObject.convert :: Unmarshal result" );
-        System.out.println("ConvertUseJaxbXMLToObject.convert :: " + entity);
+        logger.msgDebug("convert :: result - " + entity);
 
         return entity;
     }

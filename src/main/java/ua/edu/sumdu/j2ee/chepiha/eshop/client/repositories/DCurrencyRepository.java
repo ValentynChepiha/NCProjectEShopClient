@@ -6,11 +6,14 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ua.edu.sumdu.j2ee.chepiha.eshop.client.entities.db.DCurrency;
 import ua.edu.sumdu.j2ee.chepiha.eshop.client.interfaces.ModelRepository;
+import ua.edu.sumdu.j2ee.chepiha.eshop.client.services.LoggerMsgService;
 
 import java.util.List;
 
 @Repository
 public class DCurrencyRepository implements ModelRepository <DCurrency> {
+
+    private static final LoggerMsgService logger = new LoggerMsgService(DCurrencyRepository.class) ;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -32,6 +35,7 @@ public class DCurrencyRepository implements ModelRepository <DCurrency> {
 
     @Override
     public List<DCurrency> findAll() {
+        logger.msgDebugGetAll();
         String sql = "select * from lab4_chepihavv_d_currency order by r030";
         return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(DCurrency.class));
     }
@@ -45,12 +49,14 @@ public class DCurrencyRepository implements ModelRepository <DCurrency> {
 
     @Override
     public DCurrency findOne(long id) {
+        logger.msgDebugGetOne(id);
         String sql = "select * from lab4_chepihavv_d_currency where id = ?";
         return jdbcTemplate.queryForObject(sql, new BeanPropertyRowMapper<>(DCurrency.class), id);
     }
 
     @Override
     public DCurrency findOne(int r030) {
+        logger.msgDebugGetOne("R030", r030);
         String sql = "select * from lab4_chepihavv_d_currency where r030 = ?";
         return jdbcTemplate.queryForObject(sql, new BeanPropertyRowMapper<>(DCurrency.class), r030);
     }
