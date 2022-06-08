@@ -4,28 +4,30 @@ import org.springframework.stereotype.Service;
 import ua.edu.sumdu.j2ee.chepiha.eshop.client.config.ConfigApp;
 import ua.edu.sumdu.j2ee.chepiha.eshop.client.entities.xml.Product;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class ParseBasketDataValue {
 
-    private List<String> listParams = new ArrayList<>();
-
-    public void setStringToListString (String data, String separator) {
-        listParams.clear();
-        listParams.addAll( Arrays.asList( data.split(separator) ) );
+    public List<String> setStringToListString (String data, String separator) {
+        return Arrays.asList( data.split(separator) ) ;
     }
 
-    public String getSelectedCurrency() {
-         List<String> result = listParams.
-                                    stream().
-                                    filter( item -> "currencySelector".equals(item.split("=")[0])).
-                                    collect(Collectors.toList());
-         return result.size()>0 ? result.get(0).split("=")[1] : ConfigApp.DEFAULT_CURRENCY;
+    public String getSelectedCurrency(List<String> listParams) {
+         return listParams.
+                    stream().
+                    filter( item -> "currencySelector".equals(item.split("=")[0])).
+                    collect(Collectors.toList()).
+                    stream().
+                    map(item -> item.split("=")[1]).
+                    findFirst().
+                    orElse(ConfigApp.DEFAULT_CURRENCY);
     }
 
-    public List<String> getSelectedProducts() {
+    public List<String> getSelectedProducts(List<String> listParams) {
         return listParams.
                 stream().
                 filter(item ->  "item".equals(item.split("_")[0])).
@@ -80,6 +82,47 @@ public class ParseBasketDataValue {
                         stream().
                         mapToDouble(product -> product.getAmount(mapIdCount.get(product.getId()))).
                         sum();
+    }
+
+    public Map<String, String> getClientInfo (List<String> listParams) {
+        class StringPair {
+            String key;
+            String value;
+
+            public StringPair(String key, String value) {
+                this.key = key;
+                this.value = value;
+            }
+
+            public String getKey() {
+                return key;
+            }
+
+            public String getValue() {
+                return value;
+            }
+        }
+        return listParams.
+                stream().
+                filter( item -> !"item".equals(item.split("_")[0]) ).
+                collect(Collectors.toList()).
+                stream().
+                filter( item -> !"currencySelector".equals(item.split("=")[0]) ).
+                map( item -> {
+                            int idx = item.indexOf("=");
+                            try {
+                                return new StringPair(
+                                            URLDecoder.decode(item.substring(0, idx), "UTF-8"),
+                                            URLDecoder.decode(item.substring(idx + 1), "UTF-8")
+                                        );
+                            } catch (UnsupportedEncodingException e) {
+                                e.printStackTrace();
+                                return null;
+                            }
+                        }
+                ).
+                filter(Objects::nonNull).
+                collect(Collectors.toMap(StringPair::getKey, StringPair::getValue));
     }
 
 }

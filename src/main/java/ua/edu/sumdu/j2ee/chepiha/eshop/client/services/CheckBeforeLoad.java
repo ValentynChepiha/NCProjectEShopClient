@@ -22,16 +22,11 @@ public class CheckBeforeLoad {
     private LoadXMLService<Exchange> loadXMLService;
 
     public void checkUpdateExchangeRate() {
-
-        // todo:
-        //      do it in all services
-        logger.msgDebug("checkUpdateExchangeRate start...");
-
+        logger.msgInfo("checkUpdateExchangeRate start...");
         if (currencyExchangeRepository.checkLastDateUpdate() > 0) {
             return;
         }
 
-        System.out.println("CheckBeforeLoad.checkUpdate :: start...");
         Exchange exchange = new Exchange();
         exchange = loadXMLService.convertStringXMLToObject(
                 loadExchangeService.loadCurrency(),
@@ -39,13 +34,13 @@ public class CheckBeforeLoad {
                 Exchange.class,
                 Currency.class);
 
-        System.out.println("CheckBeforeLoad.checkUpdate :: loaded " + exchange.size() + " rows");
+        logger.msgDebug("checkUpdateExchangeRate :: loaded " + exchange.size() + " rows");
         if(exchange.size()==0){
             return;
         }
 
         Exchange exchangeFiltered = loadExchangeService.filterListCurrency(exchange);
-        System.out.println("CheckBeforeLoad.checkUpdate :: filtered " + exchangeFiltered.size() + " rows");
+        logger.msgDebug("checkUpdateExchangeRate :: filtered " + exchangeFiltered.size() + " rows");
 
         try {
             for(Currency currency: exchangeFiltered.getCurrencies()) {

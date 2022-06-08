@@ -5,17 +5,17 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ua.edu.sumdu.j2ee.chepiha.eshop.client.config.ConfigApp;
-import ua.edu.sumdu.j2ee.chepiha.eshop.client.entities.xml.Goods;
 import ua.edu.sumdu.j2ee.chepiha.eshop.client.services.*;
-
-import java.util.List;
-import java.util.Map;
 
 @Controller
 public class MainController {
 
     private static final LoggerMsgService logger = new LoggerMsgService(MainController.class) ;
 
+    @Autowired
+    private EndpointBasketPostService endpointBasketPostService;
+    @Autowired
+    private EndpointBasketDonePostService endpointBasketDonePostService;
     @Autowired
     private CheckBeforeLoad checkBeforeLoad;
     @Autowired
@@ -28,6 +28,8 @@ public class MainController {
     // todo:
     //        example
     //        https://www.oreilly.com/library/view/java-network-programming/1565928709/ch15s02.html
+    //        https://www.baeldung.com/java-http-request
+    //        https://stackoverflow.com/questions/3324717/sending-http-post-request-in-java
 
     @RequestMapping("/favicon.ico")
     @ResponseBody
@@ -48,12 +50,9 @@ public class MainController {
         checkBeforeLoad.checkUpdateExchangeRate();
         model.addAttribute("selectedCurrency", cur);
         model.addAttribute("exchange", loadExchangeService.loadCurrencyRate());
-        model.addAttribute(
-                "goods",
-                loadGoodsService.convertGoodsPriceUseExchangeRate(
+        model.addAttribute("goods", loadGoodsService.convertGoodsPriceUseExchangeRate(
                         ConfigApp.URL_LOAD_GOODS,
-                        loadExchangeService.getSelectedCurrencyRate(cur)
-                )
+                        loadExchangeService.getSelectedCurrencyRate(cur) )
         );
         return "welcome";
     }
@@ -61,37 +60,32 @@ public class MainController {
     @PostMapping("/basket")
     public String basketPost(@RequestBody String orderBody, Model model) {
         logger.msgInfo("Run endpoint /basket");
-
-        parseBasketDataValue.setStringToListString(orderBody, "&");
-        String selectedCurrency = parseBasketDataValue.getSelectedCurrency();
-        String goHome = "redirect:/" + selectedCurrency;
-        List<String> selectedProducts = parseBasketDataValue.getSelectedProducts();
-
-        logger.msgDebug("/basket: selectedCurrency - " + selectedCurrency);
-        logger.msgDebug("/basket: selectedProducts - " + selectedProducts);
-        if(selectedProducts.size() == 0){
-            return goHome;
+        if(!endpointBasketPostService.start(orderBody)){
+            return  endpointBasketPostService.urlGoHome();
         }
-
-        Map<Long, Integer> mapIdCount = parseBasketDataValue.getMapSelectedIdCount(selectedProducts);
-        System.out.println(" parse in basket : mapIdCount :: " + mapIdCount);
-
-        if( mapIdCount.size()==0 ){
-            return goHome;
-        }
-        List<Long> listId = parseBasketDataValue.getListSelectedId(mapIdCount);
-        System.out.println(" parse in basket : listId :: " + listId);
-
-        Goods goods = loadGoodsService.convertGoodsPriceUseExchangeRate(
-                ConfigApp.URL_LOAD_GOODS + "/" + parseBasketDataValue.concatenateId(listId, ","),
-                loadExchangeService.getSelectedCurrencyRate(selectedCurrency)
+        model.addAttribute("goods", endpointBasketPostService.getGoods());
+        model.addAttribute("selectedCurrency", endpointBasketPostService.getSelectedCurrency());
+        model.addAttribute("mapIdCount", endpointBasketPostService.getMapIdCount());
+        model.addAttribute("totalSum", parseBasketDataValue.getTotal(
+                endpointBasketPostService.getMapIdCount(),
+                endpointBasketPostService.getGoods().getGoods())
         );
-
-        model.addAttribute("goods", goods);
-        model.addAttribute("selectedCurrency", selectedCurrency);
-        model.addAttribute("mapIdCount", mapIdCount);
-        model.addAttribute("totalSum", parseBasketDataValue.getTotal(mapIdCount, goods.getGoods()) );
         return  "basket";
+    }
+
+    @PostMapping("/basket/done")
+    public String basketDonePost(@RequestBody String orderBody, Model model) {
+        logger.msgInfo("Run endpoint /basket/done");
+
+        if( !endpointBasketDonePostService.start(orderBody) ) {
+            return endpointBasketDonePostService.urlGoHome();
+        }
+
+        String result = UploadService.upload(ConfigApp.URL_CREATE_ORDER,
+                             endpointBasketDonePostService.prepareMapToUpload());
+
+        model.addAttribute("result", "ok".equals(result) ? "Order placed" : "Error. Repeat later");
+        return "basket-done";
     }
 
 }

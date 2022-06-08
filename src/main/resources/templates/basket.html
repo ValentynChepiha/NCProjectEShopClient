@@ -37,8 +37,8 @@
 
                         <div class="form-floating mb-3">
                             <input type="email" class="form-control" name="clientEmail"  id="clientEmail"
-                                   placeholder="name@example.com" value="name@example.com" required>
-                            <label for="clientEmail">Email address</label>
+                                   placeholder="name@example.com" required>
+                            <label for="clientEmail">Email address (name@example.com)</label>
                             <div class="valid-feedback">
                                 Looks good!
                             </div>
@@ -77,7 +77,7 @@
 
 
                     <div class="col-6">
-
+                        <input type="hidden" id="currencySelector" name="currencySelector" th:value="${selectedCurrency}">
                         <label for="divProducts">Total:</label>
                         <table  id="divProducts" class="table table-striped table-hover">
                             <thead>
@@ -88,7 +88,11 @@
                             </thead>
                             <tbody>
                                 <tr th:each="product, iStat : ${goods.getGoods()}">
-                                    <th th:text="${iStat.index + 1}" />
+                                    <th>
+                                        <p th:text="${iStat.index + 1}" class="mb-0"/>
+                                        <input type="hidden" th:id="'item_'+${product.getId()}" th:name="'item_'+${product.getId()}"
+                                               th:value="${mapIdCount.get(product.getId())}">
+                                    </th>
                                     <td th:text="${product.getName()} + ' (brand: ' + ${product.getBrand()} + ')'" />
                                     <td th:text="${mapIdCount.get(product.getId())}" />
                                     <td th:text="${product.getPrice()}" />
@@ -96,23 +100,24 @@
                             </tbody>
                         </table>
 
-                        <p th:text="'Total: '  + ${totalSum} +  ' ' + ${selectedCurrency}" />
+                        <div class="d-flex flex-row justify-content-end">
+                            <h5 th:text="'Total: '  + ${totalSum} +  ' ' + ${selectedCurrency}" />
+                        </div>
 
                     </div>
 
                 </div>
+                <div class="d-flex flex-row justify-content-end">
+                    <button type="submit" class="btn btn-outline-success">
+                        <i class="bi bi-cart4"></i> Buy
+                    </button>
 
+                </div>
 
             </form>
 
         </div>
     </main>
-
-<!--    <script>-->
-<!--        document.getElementById("currencySelector").addEventListener("change", (e) => {-->
-<!--            window.location.href = "/" + e.target.value;-->
-<!--        });-->
-<!--    </script>-->
 
     <footer th:insert="toolbars/footer :: footer"></footer>
 

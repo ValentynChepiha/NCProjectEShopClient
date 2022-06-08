@@ -21,7 +21,7 @@
 
                     <div class="col-md-3 offset-md-1">
                         <th:block th:if="${exchange.size()>0}">
-                            <select id="currencySelector" name="currencySelector"  class="form-control">
+                            <select id="currencySelector" name="currencySelector"  class="form-select">
                                 <option value="UAH" data-rate="1">Українська гривня (UAH)</option>
                                 <option th:each="currency: ${exchange}"
                                         th:value="${currency.getCc()}"
