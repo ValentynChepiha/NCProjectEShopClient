@@ -18,6 +18,7 @@ public class LoadGoodsService {
     public Goods load(String url) {
         logger.msgInfo("load :: start...");
         Goods goods = new Goods();
+        logger.msgDebug("load :: goods - " + goods);
         goods = loadXMLService.convertStringXMLToObject(
                 LoadService.load( url ),
                 goods,

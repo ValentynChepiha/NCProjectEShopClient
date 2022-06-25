@@ -25,11 +25,8 @@ public class MainController {
     @Autowired
     private ParseBasketDataValue parseBasketDataValue;
 
-    // todo:
-    //        example
-    //        https://www.oreilly.com/library/view/java-network-programming/1565928709/ch15s02.html
-    //        https://www.baeldung.com/java-http-request
-    //        https://stackoverflow.com/questions/3324717/sending-http-post-request-in-java
+    @Autowired
+    private ConfigApp configApp;
 
     @RequestMapping("/favicon.ico")
     @ResponseBody
@@ -37,10 +34,11 @@ public class MainController {
 
     @GetMapping("/")
     public String mainGet(Model model) {
+
         logger.msgInfo("Start root endpoint.");
         checkBeforeLoad.checkUpdateExchangeRate();
         model.addAttribute("exchange", loadExchangeService.loadCurrencyRate());
-        model.addAttribute("goods", loadGoodsService.load(ConfigApp.URL_LOAD_GOODS));
+        model.addAttribute("goods", loadGoodsService.load(configApp.getUrlLoadGoods()));
         return "welcome";
     }
 
@@ -51,7 +49,7 @@ public class MainController {
         model.addAttribute("selectedCurrency", cur);
         model.addAttribute("exchange", loadExchangeService.loadCurrencyRate());
         model.addAttribute("goods", loadGoodsService.convertGoodsPriceUseExchangeRate(
-                        ConfigApp.URL_LOAD_GOODS,
+                        configApp.getUrlLoadGoods(),
                         loadExchangeService.getSelectedCurrencyRate(cur) )
         );
         return "welcome";
@@ -81,7 +79,7 @@ public class MainController {
             return endpointBasketDonePostService.urlGoHome();
         }
 
-        String result = UploadService.upload(ConfigApp.URL_CREATE_ORDER,
+        String result = UploadService.upload(configApp.getUrlCreateOrder(),
                              endpointBasketDonePostService.prepareMapToUpload());
 
         model.addAttribute("result", "ok".equals(result) ? "Order placed" : "Error. Repeat later");

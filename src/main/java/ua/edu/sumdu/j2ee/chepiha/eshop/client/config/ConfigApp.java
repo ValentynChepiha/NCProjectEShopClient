@@ -1,12 +1,46 @@
 package ua.edu.sumdu.j2ee.chepiha.eshop.client.config;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.stereotype.Component;
+import ua.edu.sumdu.j2ee.chepiha.eshop.client.services.LoggerMsgService;
+
+@Component
+@PropertySource("classpath:application.properties")
 public class ConfigApp {
 
-    public static final String URL_LOAD_EXCHANGE_RATE = "https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?xml";
+    private static final LoggerMsgService logger = new LoggerMsgService(ConfigApp.class) ;
 
-    public static final String URL_LOAD_GOODS = "http://localhost:8090/api/goods";
-    public static final String URL_CREATE_ORDER = "http://localhost:8090/api/order/create";
+    @Value("${api.url.load.exchange.rate}")
+    private String urlLoadExchangeRate;
+    @Value("${api.url.load.goods}")
+    private String urlLoadGoods;
+    @Value("${api.url.create.order}")
+    private String urlCreateOrder;
+    @Value("${client.default.currency}")
+    private String defaultCurrency;
 
-    public static final String DEFAULT_CURRENCY = "UAH";
+    public ConfigApp() {
 
+    }
+
+    public String getUrlLoadExchangeRate() {
+        logger.msgDebug("getUrlLoadExchangeRate :: " + urlLoadExchangeRate);
+        return urlLoadExchangeRate;
+    }
+
+    public String getUrlLoadGoods() {
+        logger.msgDebug("getUrlLoadGoods :: " + urlLoadGoods);
+        return urlLoadGoods;
+    }
+
+    public String getUrlCreateOrder() {
+        logger.msgDebug("getUrlCreateOrder :: " + urlCreateOrder);
+        return urlCreateOrder;
+    }
+
+    public String getDefaultCurrency() {
+        logger.msgDebug("getDefaultCurrency :: " + defaultCurrency);
+        return defaultCurrency;
+    }
 }

@@ -23,9 +23,11 @@ public class LoadExchangeService {
     private DCurrencyRepository dCurrencyRepository;
     @Autowired
     private CurrencyRateRepository currencyRateRepository;
+    @Autowired
+    private ConfigApp configApp;
 
     public String loadCurrency() {
-        return LoadService.load( ConfigApp.URL_LOAD_EXCHANGE_RATE);
+        return LoadService.load( configApp.getUrlLoadExchangeRate());
     }
 
     public List<CurrencyRate> loadCurrencyRate() {

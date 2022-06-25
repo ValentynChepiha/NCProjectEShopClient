@@ -19,6 +19,8 @@ public class EndpointBasketPostService {
     private LoadGoodsService loadGoodsService;
     @Autowired
     private LoadExchangeService loadExchangeService;
+    @Autowired
+    private ConfigApp configApp;
 
     private String selectedCurrency;
     private Map<Long, Integer> mapIdCount;
@@ -69,7 +71,7 @@ public class EndpointBasketPostService {
 
     private String urlLoadSelectedGoods () {
         List<Long> listId = parseBasketDataValue.getListSelectedId(mapIdCount);
-        return ConfigApp.URL_LOAD_GOODS + "/" + parseBasketDataValue.concatenateId(listId, ",");
+        return configApp.getUrlLoadGoods() + "/" + parseBasketDataValue.concatenateId(listId, ",");
     }
 
 }

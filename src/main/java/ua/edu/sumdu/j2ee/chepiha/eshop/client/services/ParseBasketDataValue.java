@@ -1,5 +1,6 @@
 package ua.edu.sumdu.j2ee.chepiha.eshop.client.services;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ua.edu.sumdu.j2ee.chepiha.eshop.client.config.ConfigApp;
 import ua.edu.sumdu.j2ee.chepiha.eshop.client.entities.xml.Product;
@@ -11,6 +12,9 @@ import java.util.stream.Collectors;
 
 @Service
 public class ParseBasketDataValue {
+
+    @Autowired
+    private ConfigApp configApp;
 
     public List<String> setStringToListString (String data, String separator) {
         return Arrays.asList( data.split(separator) ) ;
@@ -24,7 +28,7 @@ public class ParseBasketDataValue {
                     stream().
                     map(item -> item.split("=")[1]).
                     findFirst().
-                    orElse(ConfigApp.DEFAULT_CURRENCY);
+                    orElse(configApp.getDefaultCurrency());
     }
 
     public List<String> getSelectedProducts(List<String> listParams) {
