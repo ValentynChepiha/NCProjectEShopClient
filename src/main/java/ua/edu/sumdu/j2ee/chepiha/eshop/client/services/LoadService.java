@@ -28,9 +28,8 @@ public class LoadService {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
-        } finally {
-            return result;
         }
+        return result;
     }
 
 }
