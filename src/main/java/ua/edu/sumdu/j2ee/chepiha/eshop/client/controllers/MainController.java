@@ -1,13 +1,15 @@
 package ua.edu.sumdu.j2ee.chepiha.eshop.client.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import ua.edu.sumdu.j2ee.chepiha.eshop.client.config.ConfigApp;
 import ua.edu.sumdu.j2ee.chepiha.eshop.client.services.*;
 
 @Controller
+@PropertySource("classpath:application.properties")
 public class MainController {
 
     private static final LoggerMsgService logger = new LoggerMsgService(MainController.class) ;
@@ -25,8 +27,10 @@ public class MainController {
     @Autowired
     private ParseBasketDataValue parseBasketDataValue;
 
-    @Autowired
-    private ConfigApp configApp;
+    @Value("${api.url.load.goods}")
+    private String urlLoadGoods;
+    @Value("${api.url.create.order}")
+    private String urlCreateOrder;
 
     @RequestMapping("/favicon.ico")
     @ResponseBody
@@ -38,7 +42,7 @@ public class MainController {
         logger.msgInfo("Start root endpoint.");
         checkBeforeLoad.checkUpdateExchangeRate();
         model.addAttribute("exchange", loadExchangeService.loadCurrencyRate());
-        model.addAttribute("goods", loadGoodsService.load(configApp.getUrlLoadGoods()));
+        model.addAttribute("goods", loadGoodsService.load(urlLoadGoods));
         return "welcome";
     }
 
@@ -49,8 +53,8 @@ public class MainController {
         model.addAttribute("selectedCurrency", cur);
         model.addAttribute("exchange", loadExchangeService.loadCurrencyRate());
         model.addAttribute("goods", loadGoodsService.convertGoodsPriceUseExchangeRate(
-                        configApp.getUrlLoadGoods(),
-                        loadExchangeService.getSelectedCurrencyRate(cur) )
+                urlLoadGoods,
+                loadExchangeService.getSelectedCurrencyRate(cur) )
         );
         return "welcome";
     }
@@ -79,11 +83,12 @@ public class MainController {
             return endpointBasketDonePostService.urlGoHome();
         }
 
-        String result = UploadService.upload(configApp.getUrlCreateOrder(),
-                             endpointBasketDonePostService.prepareMapToUpload());
+        String result = UploadService.upload(urlCreateOrder,
+                endpointBasketDonePostService.prepareMapToUpload());
 
         model.addAttribute("result", "ok".equals(result) ? "Order placed" : "Error. Repeat later");
         return "basket-done";
     }
 
 }
+

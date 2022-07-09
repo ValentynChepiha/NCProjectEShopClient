@@ -1,8 +1,9 @@
 package ua.edu.sumdu.j2ee.chepiha.eshop.client.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
-import ua.edu.sumdu.j2ee.chepiha.eshop.client.config.ConfigApp;
 import ua.edu.sumdu.j2ee.chepiha.eshop.client.entities.db.CurrencyRate;
 import ua.edu.sumdu.j2ee.chepiha.eshop.client.entities.db.DCurrency;
 import ua.edu.sumdu.j2ee.chepiha.eshop.client.entities.xml.Currency;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.Set;
 
 @Service
+@PropertySource("classpath:application.properties")
 public class LoadExchangeService {
 
     private static final LoggerMsgService logger = new LoggerMsgService(LoadExchangeService.class) ;
@@ -23,11 +25,13 @@ public class LoadExchangeService {
     private DCurrencyRepository dCurrencyRepository;
     @Autowired
     private CurrencyRateRepository currencyRateRepository;
-    @Autowired
-    private ConfigApp configApp;
+
+    @Value("${api.url.load.exchange.rate}")
+    private String urlLoadExchangeRate;
+
 
     public String loadCurrency() {
-        return LoadService.load( configApp.getUrlLoadExchangeRate());
+        return LoadService.load( urlLoadExchangeRate );
     }
 
     public List<CurrencyRate> loadCurrencyRate() {

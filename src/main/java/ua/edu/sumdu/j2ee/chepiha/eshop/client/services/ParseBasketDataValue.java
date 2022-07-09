@@ -1,8 +1,8 @@
 package ua.edu.sumdu.j2ee.chepiha.eshop.client.services;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
-import ua.edu.sumdu.j2ee.chepiha.eshop.client.config.ConfigApp;
 import ua.edu.sumdu.j2ee.chepiha.eshop.client.entities.xml.Product;
 
 import java.io.UnsupportedEncodingException;
@@ -11,10 +11,11 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@PropertySource("classpath:application.properties")
 public class ParseBasketDataValue {
 
-    @Autowired
-    private ConfigApp configApp;
+    @Value("${client.default.currency}")
+    private String defaultCurrency;
 
     public List<String> setStringToListString (String data, String separator) {
         return Arrays.asList( data.split(separator) ) ;
@@ -28,7 +29,7 @@ public class ParseBasketDataValue {
                     stream().
                     map(item -> item.split("=")[1]).
                     findFirst().
-                    orElse(configApp.getDefaultCurrency());
+                    orElse(defaultCurrency);
     }
 
     public List<String> getSelectedProducts(List<String> listParams) {
@@ -47,8 +48,8 @@ public class ParseBasketDataValue {
 
     public Map<Long, Integer> getMapSelectedIdCount(List<String> listItems) {
         class IdCount {
-            Long id;
-            Integer count;
+            final Long id;
+            final Integer count;
 
             public IdCount(Long id, Integer count) {
                 this.id = id;
@@ -90,8 +91,8 @@ public class ParseBasketDataValue {
 
     public Map<String, String> getClientInfo (List<String> listParams) {
         class StringPair {
-            String key;
-            String value;
+            final String key;
+            final String value;
 
             public StringPair(String key, String value) {
                 this.key = key;

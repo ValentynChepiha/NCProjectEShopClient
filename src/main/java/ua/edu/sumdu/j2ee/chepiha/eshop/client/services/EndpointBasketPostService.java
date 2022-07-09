@@ -1,14 +1,16 @@
 package ua.edu.sumdu.j2ee.chepiha.eshop.client.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
-import ua.edu.sumdu.j2ee.chepiha.eshop.client.config.ConfigApp;
 import ua.edu.sumdu.j2ee.chepiha.eshop.client.entities.xml.Goods;
 
 import java.util.List;
 import java.util.Map;
 
 @Service
+@PropertySource("classpath:application.properties")
 public class EndpointBasketPostService {
 
     private static final LoggerMsgService logger = new LoggerMsgService(EndpointBasketPostService.class) ;
@@ -19,8 +21,9 @@ public class EndpointBasketPostService {
     private LoadGoodsService loadGoodsService;
     @Autowired
     private LoadExchangeService loadExchangeService;
-    @Autowired
-    private ConfigApp configApp;
+
+    @Value("${api.url.load.goods}")
+    private String urlLoadGoods;
 
     private String selectedCurrency;
     private Map<Long, Integer> mapIdCount;
@@ -71,7 +74,7 @@ public class EndpointBasketPostService {
 
     private String urlLoadSelectedGoods () {
         List<Long> listId = parseBasketDataValue.getListSelectedId(mapIdCount);
-        return configApp.getUrlLoadGoods() + "/" + parseBasketDataValue.concatenateId(listId, ",");
+        return urlLoadGoods + "/" + parseBasketDataValue.concatenateId(listId, ",");
     }
 
 }
