@@ -33,6 +33,14 @@ public class Goods {
         goods.add(product);
     }
 
+    public void clear() {
+        goods.clear();
+    }
+
+    public void addAll(Goods goods) {
+        this.goods.addAll( goods.getGoods() );
+    }
+
     @Override
     public String toString() {
 

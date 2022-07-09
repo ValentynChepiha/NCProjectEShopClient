@@ -4,17 +4,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ua.edu.sumdu.j2ee.chepiha.eshop.client.entities.xml.Goods;
 import ua.edu.sumdu.j2ee.chepiha.eshop.client.entities.xml.Product;
+import ua.edu.sumdu.j2ee.chepiha.eshop.client.interfaces.LoadGoodsService;
 
 import java.util.List;
 
 @Service
-public class LoadGoodsService {
+public class LoadGoodsServiceImpl implements LoadGoodsService {
 
-    private static final LoggerMsgService logger = new LoggerMsgService(LoadGoodsService.class) ;
+    private static final LoggerMsgService logger = new LoggerMsgService(LoadGoodsServiceImpl.class) ;
+
+    private final LoadXMLService<Goods> loadXMLService;
 
     @Autowired
-    LoadXMLService<Goods> loadXMLService;
+    public LoadGoodsServiceImpl(LoadXMLService<Goods> loadXMLService) {
+        this.loadXMLService = loadXMLService;
+    }
 
+    @Override
     public Goods load(String url) {
         logger.msgInfo("load :: start...");
         Goods goods = new Goods();
@@ -29,6 +35,7 @@ public class LoadGoodsService {
         return goods;
     }
 
+    @Override
     public Goods convertGoodsPriceUseExchangeRate(String url, float rate) {
         logger.msgInfo("convertGoodsPriceUseExchangeRate :: start...");
         logger.msgDebug("convertGoodsPriceUseExchangeRate : url - " + url);

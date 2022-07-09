@@ -6,6 +6,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import ua.edu.sumdu.j2ee.chepiha.eshop.client.interfaces.*;
 import ua.edu.sumdu.j2ee.chepiha.eshop.client.services.*;
 
 @Controller
@@ -14,23 +15,29 @@ public class MainController {
 
     private static final LoggerMsgService logger = new LoggerMsgService(MainController.class) ;
 
-    @Autowired
-    private EndpointBasketPostService endpointBasketPostService;
-    @Autowired
-    private EndpointBasketDonePostService endpointBasketDonePostService;
-    @Autowired
-    private CheckBeforeLoad checkBeforeLoad;
-    @Autowired
-    private LoadGoodsService loadGoodsService;
-    @Autowired
-    private LoadExchangeService loadExchangeService;
-    @Autowired
-    private ParseBasketDataValue parseBasketDataValue;
+    private final EndpointBasketPostService endpointBasketPostService;
+    private final EndpointBasketDonePostService endpointBasketDonePostService;
+    private final CheckBeforeLoadService checkBeforeLoadService;
+    private final LoadGoodsService loadGoodsService;
+    private final LoadExchangeService loadExchangeService;
+    private final ParseBasketDataValue parseBasketDataValue;
 
     @Value("${api.url.load.goods}")
     private String urlLoadGoods;
     @Value("${api.url.create.order}")
     private String urlCreateOrder;
+
+    @Autowired
+    public MainController(EndpointBasketPostService endpointBasketPostService, EndpointBasketDonePostService endpointBasketDonePostService,
+                          CheckBeforeLoadService checkBeforeLoadService, LoadGoodsService loadGoodsService,
+                          LoadExchangeService loadExchangeService, ParseBasketDataValue parseBasketDataValue) {
+        this.endpointBasketPostService = endpointBasketPostService;
+        this.endpointBasketDonePostService = endpointBasketDonePostService;
+        this.checkBeforeLoadService = checkBeforeLoadService;
+        this.loadGoodsService = loadGoodsService;
+        this.loadExchangeService = loadExchangeService;
+        this.parseBasketDataValue = parseBasketDataValue;
+    }
 
     @RequestMapping("/favicon.ico")
     @ResponseBody
@@ -40,7 +47,7 @@ public class MainController {
     public String mainGet(Model model) {
 
         logger.msgInfo("Start root endpoint.");
-        checkBeforeLoad.checkUpdateExchangeRate();
+        checkBeforeLoadService.checkUpdateExchangeRate();
         model.addAttribute("exchange", loadExchangeService.loadCurrencyRate());
         model.addAttribute("goods", loadGoodsService.load(urlLoadGoods));
         return "welcome";
@@ -49,7 +56,7 @@ public class MainController {
     @GetMapping("/{cur}")
     public String changeCurrencyGet(Model model, @PathVariable String cur) {
         logger.msgInfo("Change currency on " + cur);
-        checkBeforeLoad.checkUpdateExchangeRate();
+        checkBeforeLoadService.checkUpdateExchangeRate();
         model.addAttribute("selectedCurrency", cur);
         model.addAttribute("exchange", loadExchangeService.loadCurrencyRate());
         model.addAttribute("goods", loadGoodsService.convertGoodsPriceUseExchangeRate(

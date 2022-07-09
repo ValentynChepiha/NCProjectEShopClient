@@ -5,22 +5,30 @@ import org.springframework.stereotype.Service;
 import ua.edu.sumdu.j2ee.chepiha.eshop.client.entities.db.CurrencyExchange;
 import ua.edu.sumdu.j2ee.chepiha.eshop.client.entities.xml.Currency;
 import ua.edu.sumdu.j2ee.chepiha.eshop.client.entities.xml.Exchange;
-import ua.edu.sumdu.j2ee.chepiha.eshop.client.repositories.CurrencyExchangeRepository;
+import ua.edu.sumdu.j2ee.chepiha.eshop.client.interfaces.CheckBeforeLoadService;
+import ua.edu.sumdu.j2ee.chepiha.eshop.client.interfaces.LoadExchangeService;
+import ua.edu.sumdu.j2ee.chepiha.eshop.client.interfaces.ModelExchangeRepository;
 
 import java.text.ParseException;
 
 @Service
-public class CheckBeforeLoad {
+public class CheckBeforeLoadServiceImpl implements CheckBeforeLoadService {
 
-    private static final LoggerMsgService logger = new LoggerMsgService(CheckBeforeLoad.class) ;
+    private static final LoggerMsgService logger = new LoggerMsgService(CheckBeforeLoadServiceImpl.class) ;
+
+    private final ModelExchangeRepository<CurrencyExchange> currencyExchangeRepository;
+    private final LoadExchangeService loadExchangeService;
+    private final LoadXMLService<Exchange> loadXMLService;
 
     @Autowired
-    private CurrencyExchangeRepository currencyExchangeRepository;
-    @Autowired
-    private LoadExchangeService loadExchangeService;
-    @Autowired
-    private LoadXMLService<Exchange> loadXMLService;
+    public CheckBeforeLoadServiceImpl(ModelExchangeRepository<CurrencyExchange> currencyExchangeRepository,
+                                      LoadExchangeService loadExchangeService, LoadXMLService<Exchange> loadXMLService) {
+        this.currencyExchangeRepository = currencyExchangeRepository;
+        this.loadExchangeService = loadExchangeService;
+        this.loadXMLService = loadXMLService;
+    }
 
+    @Override
     public void checkUpdateExchangeRate() {
         logger.msgInfo("checkUpdateExchangeRate start...");
         if (currencyExchangeRepository.checkLastDateUpdate() > 0) {

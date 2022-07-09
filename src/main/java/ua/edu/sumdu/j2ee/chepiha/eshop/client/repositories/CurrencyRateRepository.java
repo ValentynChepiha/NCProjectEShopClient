@@ -15,8 +15,12 @@ public class CurrencyRateRepository implements ModelRateRepository<CurrencyRate>
 
     private static final LoggerMsgService logger = new LoggerMsgService(CurrencyRateRepository.class) ;
 
+    private final JdbcTemplate jdbcTemplate;
+
     @Autowired
-    private JdbcTemplate jdbcTemplate;
+    public CurrencyRateRepository(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
 
     @Override
     public List<CurrencyRate> findActualExchange() {

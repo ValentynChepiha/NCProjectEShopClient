@@ -15,8 +15,12 @@ public class CurrencyExchangeRepository implements ModelExchangeRepository<Curre
 
     private static final LoggerMsgService logger = new LoggerMsgService(CurrencyExchangeRepository.class) ;
 
+    private final JdbcTemplate jdbcTemplate;
+
     @Autowired
-    private JdbcTemplate jdbcTemplate;
+    public CurrencyExchangeRepository(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
 
     @Override
     public void create(CurrencyExchange entity) {

@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 import ua.edu.sumdu.j2ee.chepiha.eshop.client.entities.xml.Product;
+import ua.edu.sumdu.j2ee.chepiha.eshop.client.interfaces.ParseBasketDataValue;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -12,15 +13,17 @@ import java.util.stream.Collectors;
 
 @Service
 @PropertySource("classpath:application.properties")
-public class ParseBasketDataValue {
+public class ParseBasketDataValueImpl implements ParseBasketDataValue {
 
     @Value("${client.default.currency}")
     private String defaultCurrency;
 
-    public List<String> setStringToListString (String data, String separator) {
+    @Override
+    public List<String> setStringToListString(String data, String separator) {
         return Arrays.asList( data.split(separator) ) ;
     }
 
+    @Override
     public String getSelectedCurrency(List<String> listParams) {
          return listParams.
                     stream().
@@ -32,6 +35,7 @@ public class ParseBasketDataValue {
                     orElse(defaultCurrency);
     }
 
+    @Override
     public List<String> getSelectedProducts(List<String> listParams) {
         return listParams.
                 stream().
@@ -42,10 +46,12 @@ public class ParseBasketDataValue {
                 collect(Collectors.toList());
     }
 
+    @Override
     public List<Long> getListSelectedId(Map<Long, Integer> mapIdCount) {
         return new ArrayList<>(mapIdCount.keySet());
     }
 
+    @Override
     public Map<Long, Integer> getMapSelectedIdCount(List<String> listItems) {
         class IdCount {
             final Long id;
@@ -75,6 +81,7 @@ public class ParseBasketDataValue {
                 collect(Collectors.toMap(IdCount::getId, IdCount::getCount));
     }
 
+    @Override
     public String concatenateId(List<Long> listId, String separator){
         return listId.
                 stream().
@@ -82,6 +89,7 @@ public class ParseBasketDataValue {
                 collect(Collectors.joining(separator));
     }
 
+    @Override
     public float getTotal(Map<Long, Integer> mapIdCount, List<Product> listProduct) {
         return (float) listProduct.
                         stream().
@@ -89,7 +97,8 @@ public class ParseBasketDataValue {
                         sum();
     }
 
-    public Map<String, String> getClientInfo (List<String> listParams) {
+    @Override
+    public Map<String, String> getClientInfo(List<String> listParams) {
         class StringPair {
             final String key;
             final String value;

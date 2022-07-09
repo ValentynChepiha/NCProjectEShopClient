@@ -8,8 +8,10 @@ import ua.edu.sumdu.j2ee.chepiha.eshop.client.entities.db.CurrencyRate;
 import ua.edu.sumdu.j2ee.chepiha.eshop.client.entities.db.DCurrency;
 import ua.edu.sumdu.j2ee.chepiha.eshop.client.entities.xml.Currency;
 import ua.edu.sumdu.j2ee.chepiha.eshop.client.entities.xml.Exchange;
-import ua.edu.sumdu.j2ee.chepiha.eshop.client.repositories.CurrencyRateRepository;
-import ua.edu.sumdu.j2ee.chepiha.eshop.client.repositories.DCurrencyRepository;
+import ua.edu.sumdu.j2ee.chepiha.eshop.client.interfaces.LoadExchangeService;
+import ua.edu.sumdu.j2ee.chepiha.eshop.client.interfaces.ModelRateRepository;
+import ua.edu.sumdu.j2ee.chepiha.eshop.client.interfaces.ModelRepository;
+import ua.edu.sumdu.j2ee.chepiha.eshop.client.interfaces.ModelRepositoryFind;
 
 import java.util.HashSet;
 import java.util.List;
@@ -17,28 +19,35 @@ import java.util.Set;
 
 @Service
 @PropertySource("classpath:application.properties")
-public class LoadExchangeService {
+public class LoadExchangeServiceImpl implements LoadExchangeService {
 
-    private static final LoggerMsgService logger = new LoggerMsgService(LoadExchangeService.class) ;
+    private static final LoggerMsgService logger = new LoggerMsgService(LoadExchangeServiceImpl.class) ;
 
-    @Autowired
-    private DCurrencyRepository dCurrencyRepository;
-    @Autowired
-    private CurrencyRateRepository currencyRateRepository;
+    private final ModelRepositoryFind<DCurrency> dCurrencyRepository;
+    private final ModelRateRepository<CurrencyRate> currencyRateRepository;
 
     @Value("${api.url.load.exchange.rate}")
     private String urlLoadExchangeRate;
 
+    @Autowired
+    public LoadExchangeServiceImpl(ModelRepositoryFind<DCurrency> dCurrencyRepository,
+                                   ModelRateRepository<CurrencyRate> currencyRateRepository) {
+        this.dCurrencyRepository = dCurrencyRepository;
+        this.currencyRateRepository = currencyRateRepository;
+    }
 
+    @Override
     public String loadCurrency() {
         return LoadService.load( urlLoadExchangeRate );
     }
 
+    @Override
     public List<CurrencyRate> loadCurrencyRate() {
         return currencyRateRepository.findActualExchange();
     }
 
-    public float getSelectedCurrencyRate (String cc) {
+    @Override
+    public float getSelectedCurrencyRate(String cc) {
 
         logger.msgDebug("getSelectedCurrencyRate: input data - " + cc);
         List<CurrencyRate> currencyRateList = loadCurrencyRate();
@@ -55,6 +64,7 @@ public class LoadExchangeService {
         return result;
     }
 
+    @Override
     public Exchange filterListCurrency(Exchange dataExchange) {
         logger.msgDebug("filterListCurrency: input data - " + dataExchange);
 

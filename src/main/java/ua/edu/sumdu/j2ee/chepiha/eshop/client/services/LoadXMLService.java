@@ -10,8 +10,12 @@ import java.io.IOException;
 @Service
 public class LoadXMLService<T> {
 
+    private final ConvertUseJaxbXMLToObject<T> convertUseJaxbXMLToObject;
+
     @Autowired
-    ConvertUseJaxbXMLToObject<T> convertUseJaxbXMLToObject;
+    public LoadXMLService(ConvertUseJaxbXMLToObject<T> convertUseJaxbXMLToObject) {
+        this.convertUseJaxbXMLToObject = convertUseJaxbXMLToObject;
+    }
 
     public T convertStringXMLToObject(String dataXML, T entity, Class parent, Class child) {
 
