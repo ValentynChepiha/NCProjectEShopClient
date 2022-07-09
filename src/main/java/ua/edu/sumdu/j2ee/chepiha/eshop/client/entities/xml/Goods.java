@@ -4,6 +4,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @XmlRootElement(name="List")
 public class Goods {
@@ -56,5 +57,18 @@ public class Goods {
         return "Exchange {" +
                 "goods = " + currenciesString.toString() +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Goods goods1 = (Goods) o;
+        return Objects.equals(goods, goods1.goods);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(goods);
     }
 }

@@ -3,6 +3,7 @@ package ua.edu.sumdu.j2ee.chepiha.eshop.client.entities.xml;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import java.util.Objects;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Product {
@@ -120,5 +121,25 @@ public class Product {
                 ", idGift=" + idGift +
                 ", nameGift='" + nameGift + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Product product = (Product) o;
+        return id == product.id &&
+                Float.compare(product.price, price) == 0 &&
+                count == product.count &&
+                Float.compare(product.discount, discount) == 0 &&
+                idGift == product.idGift &&
+                Objects.equals(name, product.name) &&
+                Objects.equals(brand, product.brand) &&
+                Objects.equals(nameGift, product.nameGift);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, brand, price, count, discount, idGift, nameGift);
     }
 }

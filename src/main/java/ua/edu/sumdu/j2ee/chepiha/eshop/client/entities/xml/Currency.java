@@ -3,6 +3,7 @@ package ua.edu.sumdu.j2ee.chepiha.eshop.client.entities.xml;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import java.util.Objects;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Currency {
@@ -77,5 +78,22 @@ public class Currency {
                 ", cc='" + cc + '\'' +
                 ", exchangedate='" + exchangedate + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Currency currency = (Currency) o;
+        return r030 == currency.r030 &&
+                Double.compare(currency.rate, rate) == 0 &&
+                Objects.equals(txt, currency.txt) &&
+                Objects.equals(cc, currency.cc) &&
+                Objects.equals(exchangedate, currency.exchangedate);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(r030, txt, rate, cc, exchangedate);
     }
 }

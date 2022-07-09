@@ -4,6 +4,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @XmlRootElement(name="exchange")
 public class Exchange {
@@ -48,5 +49,18 @@ public class Exchange {
         return "Exchange {" +
                 "currencies = " + currenciesString.toString() +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Exchange exchange = (Exchange) o;
+        return Objects.equals(currencies, exchange.currencies);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(currencies);
     }
 }
