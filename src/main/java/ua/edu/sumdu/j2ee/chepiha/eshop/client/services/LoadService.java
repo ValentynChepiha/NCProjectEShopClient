@@ -19,11 +19,11 @@ public class LoadService {
             // chain the InputStream to a Reader
             Reader r = new InputStreamReader(buffer);
             int c;
-            StringBuffer stringBuffer = new StringBuffer();
+            StringBuilder stringBuilder = new StringBuilder();
             while ((c = r.read(  )) != -1) {
-                stringBuffer.append((char) c);
+                stringBuilder.append((char) c);
             }
-            result = stringBuffer.toString();
+            result = stringBuilder.toString();
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (IOException e) {
