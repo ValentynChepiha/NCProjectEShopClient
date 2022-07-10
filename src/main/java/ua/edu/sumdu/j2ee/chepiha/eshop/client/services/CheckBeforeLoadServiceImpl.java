@@ -1,5 +1,6 @@
 package ua.edu.sumdu.j2ee.chepiha.eshop.client.services;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
@@ -12,10 +13,9 @@ import ua.edu.sumdu.j2ee.chepiha.eshop.client.interfaces.ModelExchangeRepository
 
 import java.sql.Date;
 
+@Slf4j
 @Service
 public class CheckBeforeLoadServiceImpl implements CheckBeforeLoadService {
-
-    private static final LoggerMsgService logger = new LoggerMsgService(CheckBeforeLoadServiceImpl.class) ;
 
     private final ModelExchangeRepository<CurrencyExchange> currencyExchangeRepository;
     private final LoadExchangeService loadExchangeService;
@@ -31,20 +31,20 @@ public class CheckBeforeLoadServiceImpl implements CheckBeforeLoadService {
 
     @Override
     public void checkUpdateExchangeRate() {
-        logger.msgInfo("checkUpdateExchangeRate start...");
+        log.info("checkUpdateExchangeRate start...");
         if (currencyExchangeRepository.checkLastDateUpdate() > 0) {
             return;
         }
         Exchange exchange = new Exchange();
         exchange = conversionService.convert(loadExchangeService.loadCurrency(), Exchange.class);
 
-        logger.msgDebug("checkUpdateExchangeRate :: loaded " + exchange.size() + " rows");
+        log.debug("checkUpdateExchangeRate :: loaded " + exchange.size() + " rows");
         if(exchange.size()==0){
             return;
         }
 
         Exchange exchangeFiltered = loadExchangeService.filterListCurrency(exchange);
-        logger.msgDebug("checkUpdateExchangeRate :: filtered " + exchangeFiltered.size() + " rows");
+        log.debug("checkUpdateExchangeRate :: filtered " + exchangeFiltered.size() + " rows");
 
         for(Currency currency: exchangeFiltered.getCurrencies()) {
             currencyExchangeRepository.create(

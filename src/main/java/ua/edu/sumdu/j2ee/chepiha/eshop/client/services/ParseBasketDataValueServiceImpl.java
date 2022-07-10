@@ -1,30 +1,43 @@
 package ua.edu.sumdu.j2ee.chepiha.eshop.client.services;
 
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
 import ua.edu.sumdu.j2ee.chepiha.eshop.client.entities.xml.Product;
-import ua.edu.sumdu.j2ee.chepiha.eshop.client.interfaces.ParseBasketDataValue;
+import ua.edu.sumdu.j2ee.chepiha.eshop.client.interfaces.ParseBasketDataValueService;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @PropertySource("classpath:application.properties")
-public class ParseBasketDataValueImpl implements ParseBasketDataValue {
+public class ParseBasketDataValueServiceImpl implements ParseBasketDataValueService {
 
     @Value("${client.default.currency}")
     private String defaultCurrency;
 
+    private final ConversionService conversionService;
+
+    @Autowired
+    public ParseBasketDataValueServiceImpl(ConversionService conversionService) {
+        this.conversionService = conversionService;
+    }
+
     @Override
     public List<String> setStringToListString(String data, String separator) {
+        log.debug("setStringToListString :: data: " + data + "; separator: " + separator);
         return Arrays.asList( data.split(separator) ) ;
     }
 
     @Override
     public String getSelectedCurrency(List<String> listParams) {
+        log.debug("getSelectedCurrency :: listParams: " + listParams.toString());
          return listParams.
                     stream().
                     filter( item -> "currencySelector".equals(item.split("=")[0])).
@@ -37,6 +50,7 @@ public class ParseBasketDataValueImpl implements ParseBasketDataValue {
 
     @Override
     public List<String> getSelectedProducts(List<String> listParams) {
+        log.debug("getSelectedProducts :: listParams: " + listParams.toString());
         return listParams.
                 stream().
                 filter(item ->  "item".equals(item.split("_")[0])).
@@ -48,6 +62,7 @@ public class ParseBasketDataValueImpl implements ParseBasketDataValue {
 
     @Override
     public List<Long> getListSelectedId(Map<Long, Integer> mapIdCount) {
+        log.debug("getListSelectedId :: mapIdCount: " + conversionService.convert(mapIdCount, String.class));
         return new ArrayList<>(mapIdCount.keySet());
     }
 
@@ -71,6 +86,7 @@ public class ParseBasketDataValueImpl implements ParseBasketDataValue {
             }
         }
 
+        log.debug("getMapSelectedIdCount :: listItems: " + listItems.toString());
         return listItems.
                 stream().
                 map(item -> new IdCount(
@@ -83,6 +99,7 @@ public class ParseBasketDataValueImpl implements ParseBasketDataValue {
 
     @Override
     public String concatenateId(List<Long> listId, String separator){
+        log.debug("concatenateId :: listId: " + listId + "; separator: " + separator);
         return listId.
                 stream().
                 map(Object::toString).
@@ -91,6 +108,8 @@ public class ParseBasketDataValueImpl implements ParseBasketDataValue {
 
     @Override
     public float getTotal(Map<Long, Integer> mapIdCount, List<Product> listProduct) {
+        log.debug("getTotal :: mapIdCount: " + conversionService.convert(mapIdCount, String.class)
+                    + "; listProduct: " + listProduct);
         return (float) listProduct.
                         stream().
                         mapToDouble(product -> product.getAmount(mapIdCount.get(product.getId()))).
@@ -116,6 +135,8 @@ public class ParseBasketDataValueImpl implements ParseBasketDataValue {
                 return value;
             }
         }
+
+        log.debug("getClientInfo :: listParams: " + listParams.toString());
         return listParams.
                 stream().
                 filter( item -> !"item".equals(item.split("_")[0]) ).
@@ -130,7 +151,7 @@ public class ParseBasketDataValueImpl implements ParseBasketDataValue {
                                             URLDecoder.decode(item.substring(idx + 1), "UTF-8")
                                         );
                             } catch (UnsupportedEncodingException e) {
-                                e.printStackTrace();
+                                log.debug("getClientInfo :: error decode: idx: " + idx + "; item: " + item);
                                 return null;
                             }
                         }

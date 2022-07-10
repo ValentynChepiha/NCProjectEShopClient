@@ -1,28 +1,27 @@
 package ua.edu.sumdu.j2ee.chepiha.eshop.client.services;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ua.edu.sumdu.j2ee.chepiha.eshop.client.controllers.MainController;
 import ua.edu.sumdu.j2ee.chepiha.eshop.client.interfaces.EndpointBasketDonePostService;
-import ua.edu.sumdu.j2ee.chepiha.eshop.client.interfaces.ParseBasketDataValue;
+import ua.edu.sumdu.j2ee.chepiha.eshop.client.interfaces.ParseBasketDataValueService;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Service
 public class EndpointBasketDonePostServiceImpl implements EndpointBasketDonePostService {
 
-    private static final LoggerMsgService logger = new LoggerMsgService(MainController.class) ;
-
-    private final ParseBasketDataValue parseBasketDataValue;
+    private final ParseBasketDataValueService parseBasketDataValueService;
     private final StringBuilder selectedCurrency;
     private final Map<String, String> clientInfoMap;
     private final Map<Long, Integer> idCountMap;
 
     @Autowired
-    public EndpointBasketDonePostServiceImpl(ParseBasketDataValue parseBasketDataValue) {
-        this.parseBasketDataValue = parseBasketDataValue;
+    public EndpointBasketDonePostServiceImpl(ParseBasketDataValueService parseBasketDataValueService) {
+        this.parseBasketDataValueService = parseBasketDataValueService;
         selectedCurrency = new StringBuilder();
         clientInfoMap = new HashMap<>();
         idCountMap = new HashMap<>();
@@ -63,20 +62,20 @@ public class EndpointBasketDonePostServiceImpl implements EndpointBasketDonePost
 
     @Override
     public boolean start(String orderBody) {
-        logger.msgInfo("start :: start...");
+        log.info("EndpointBasketDonePostServiceImpl.start :: starting...");
 
-        List<String> listParams = parseBasketDataValue.setStringToListString(orderBody, "&");
-        setSelectedCurrency( parseBasketDataValue.getSelectedCurrency(listParams) );
-        setIdCountMap( parseBasketDataValue.getMapSelectedIdCount(parseBasketDataValue.getSelectedProducts(listParams)) );
-        setClientInfoMap( parseBasketDataValue.getClientInfo(listParams) );
+        List<String> listParams = parseBasketDataValueService.setStringToListString(orderBody, "&");
+        setSelectedCurrency( parseBasketDataValueService.getSelectedCurrency(listParams) );
+        setIdCountMap( parseBasketDataValueService.getMapSelectedIdCount(parseBasketDataValueService.getSelectedProducts(listParams)) );
+        setClientInfoMap( parseBasketDataValueService.getClientInfo(listParams) );
 
         if( idCountMap.size() == 0 && clientInfoMap.size() != 4 ) {
             return false;
         }
 
-        logger.msgDebug("/basket/done: selectedCurrency - " + getSelectedCurrency() );
-        logger.msgDebug("/basket/done: idCountMap - " + getIdCountMap() );
-        logger.msgDebug("/basket/done: clientInfoMap - " + getClientInfoMap() );
+        log.debug("/basket/done: selectedCurrency - " + getSelectedCurrency() );
+        log.debug("/basket/done: idCountMap - " + getIdCountMap() );
+        log.debug("/basket/done: clientInfoMap - " + getClientInfoMap() );
         return true;
     }
 

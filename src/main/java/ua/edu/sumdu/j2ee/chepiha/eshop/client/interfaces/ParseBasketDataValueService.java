@@ -5,7 +5,7 @@ import ua.edu.sumdu.j2ee.chepiha.eshop.client.entities.xml.Product;
 import java.util.List;
 import java.util.Map;
 
-public interface ParseBasketDataValue {
+public interface ParseBasketDataValueService {
     List<String> setStringToListString(String data, String separator);
 
     String getSelectedCurrency(List<String> listParams);

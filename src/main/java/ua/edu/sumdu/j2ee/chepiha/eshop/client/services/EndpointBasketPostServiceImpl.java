@@ -1,5 +1,6 @@
 package ua.edu.sumdu.j2ee.chepiha.eshop.client.services;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
@@ -8,19 +9,18 @@ import ua.edu.sumdu.j2ee.chepiha.eshop.client.entities.xml.Goods;
 import ua.edu.sumdu.j2ee.chepiha.eshop.client.interfaces.EndpointBasketPostService;
 import ua.edu.sumdu.j2ee.chepiha.eshop.client.interfaces.LoadExchangeService;
 import ua.edu.sumdu.j2ee.chepiha.eshop.client.interfaces.LoadGoodsService;
-import ua.edu.sumdu.j2ee.chepiha.eshop.client.interfaces.ParseBasketDataValue;
+import ua.edu.sumdu.j2ee.chepiha.eshop.client.interfaces.ParseBasketDataValueService;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Service
 @PropertySource("classpath:application.properties")
 public class EndpointBasketPostServiceImpl implements EndpointBasketPostService {
 
-    private static final LoggerMsgService logger = new LoggerMsgService(EndpointBasketPostServiceImpl.class) ;
-
-    private final ParseBasketDataValue parseBasketDataValue;
+    private final ParseBasketDataValueService parseBasketDataValueService;
     private final LoadGoodsService loadGoodsService;
     private final LoadExchangeService loadExchangeService;
     private final StringBuilder selectedCurrency;
@@ -31,9 +31,9 @@ public class EndpointBasketPostServiceImpl implements EndpointBasketPostService 
     private String urlLoadGoods;
 
     @Autowired
-    public EndpointBasketPostServiceImpl(ParseBasketDataValue parseBasketDataValue, LoadGoodsService loadGoodsService,
+    public EndpointBasketPostServiceImpl(ParseBasketDataValueService parseBasketDataValueService, LoadGoodsService loadGoodsService,
                                          LoadExchangeService loadExchangeService) {
-        this.parseBasketDataValue = parseBasketDataValue;
+        this.parseBasketDataValueService = parseBasketDataValueService;
         this.loadGoodsService = loadGoodsService;
         this.loadExchangeService = loadExchangeService;
         selectedCurrency = new StringBuilder();
@@ -76,20 +76,20 @@ public class EndpointBasketPostServiceImpl implements EndpointBasketPostService 
 
     @Override
     public boolean start(String orderBody) {
-        logger.msgInfo("start :: start...");
+        log.info("EndpointBasketPostServiceImpl.start :: starting...");
 
-        List<String> listParams = parseBasketDataValue.setStringToListString(orderBody, "&");
-        setSelectedCurrency( parseBasketDataValue.getSelectedCurrency( listParams ) );
-        List<String> selectedProducts = parseBasketDataValue.getSelectedProducts(listParams);
+        List<String> listParams = parseBasketDataValueService.setStringToListString(orderBody, "&");
+        setSelectedCurrency( parseBasketDataValueService.getSelectedCurrency( listParams ) );
+        List<String> selectedProducts = parseBasketDataValueService.getSelectedProducts(listParams);
 
-        logger.msgDebug("/basket: selectedCurrency - " + selectedCurrency);
-        logger.msgDebug("/basket: selectedProducts - " + selectedProducts);
+        log.debug("/basket: selectedCurrency - " + selectedCurrency);
+        log.debug("/basket: selectedProducts - " + selectedProducts);
 
         if(selectedProducts.size() == 0){
             return false;
         }
 
-        setMapIdCount( parseBasketDataValue.getMapSelectedIdCount(selectedProducts) );
+        setMapIdCount( parseBasketDataValueService.getMapSelectedIdCount(selectedProducts) );
         if( mapIdCount.size()==0 ){
             return false;
         }
@@ -106,8 +106,9 @@ public class EndpointBasketPostServiceImpl implements EndpointBasketPostService 
     }
 
     private String urlLoadSelectedGoods () {
-        List<Long> listId = parseBasketDataValue.getListSelectedId(mapIdCount);
-        return urlLoadGoods + "/" + parseBasketDataValue.concatenateId(listId, ",");
+        List<Long> listId = parseBasketDataValueService.getListSelectedId(mapIdCount);
+        log.debug("selected goods: " + listId.toString());
+        return urlLoadGoods + "/" + parseBasketDataValueService.concatenateId(listId, ",");
     }
 
 }

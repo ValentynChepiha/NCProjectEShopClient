@@ -1,5 +1,6 @@
 package ua.edu.sumdu.j2ee.chepiha.eshop.client.services;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
@@ -9,10 +10,9 @@ import ua.edu.sumdu.j2ee.chepiha.eshop.client.interfaces.LoadGoodsService;
 
 import java.util.List;
 
+@Slf4j
 @Service
 public class LoadGoodsServiceImpl implements LoadGoodsService {
-
-    private static final LoggerMsgService logger = new LoggerMsgService(LoadGoodsServiceImpl.class) ;
 
     private final ConversionService conversionService;
 
@@ -23,31 +23,31 @@ public class LoadGoodsServiceImpl implements LoadGoodsService {
 
     @Override
     public Goods load(String url) {
-        logger.msgInfo("load :: start...");
+        log.info("LoadGoodsServiceImpl.load :: starting...");
         Goods goods = new Goods();
-        logger.msgDebug("load :: goods - " + goods);
+        log.debug("load :: goods - " + goods);
         goods = conversionService.convert(LoadService.load( url ), Goods.class);
-        logger.msgDebug("load :: loaded " + goods.size() + " rows");
+        log.debug("load :: loaded " + goods.size() + " rows");
         return goods;
     }
 
     @Override
     public Goods convertGoodsPriceUseExchangeRate(String url, float rate) {
-        logger.msgInfo("convertGoodsPriceUseExchangeRate :: start...");
-        logger.msgDebug("convertGoodsPriceUseExchangeRate : url - " + url);
+        log.info("convertGoodsPriceUseExchangeRate :: start...");
+        log.debug("convertGoodsPriceUseExchangeRate : url - " + url);
         Goods goods = load( url );
         if(rate <= 0){
             return goods;
         }
 
         List<Product> productList = goods.getGoods();
-        logger.msgDebug("convertGoodsPriceUseExchangeRate : productList, old price - " + productList);
+        log.debug("convertGoodsPriceUseExchangeRate : productList, old price - " + productList);
         for(Product product: productList) {
-            product.setPrice( ((float) Math.round( product.getPrice() * 100 / rate )) / 100 );
+            product.setPrice( product.getPriceByRate(rate) );
         }
 
         goods.setGoods(productList);
-        logger.msgDebug("convertGoodsPriceUseExchangeRate : productList, new price - " + productList);
+        log.debug("convertGoodsPriceUseExchangeRate : productList, new price - " + productList);
         return goods;
     }
     

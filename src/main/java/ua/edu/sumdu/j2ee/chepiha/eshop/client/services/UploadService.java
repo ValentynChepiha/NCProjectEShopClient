@@ -1,5 +1,7 @@
 package ua.edu.sumdu.j2ee.chepiha.eshop.client.services;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -9,6 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.StringJoiner;
 
+@Slf4j
 public class UploadService {
 
     public static String upload(String urlString, Map<String, String> requestParams) {
@@ -50,13 +53,15 @@ public class UploadService {
             }
             return response.toString();
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            log.error("Wrong URL: " + url);
+            return "error";
         } catch (ProtocolException e) {
-            e.printStackTrace();
+            log.error("Communication error in UploadService.upload");
+            return "error";
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Critical error in UploadService.upload");
+            return "error";
         }
-        return "error";
     }
 
 }

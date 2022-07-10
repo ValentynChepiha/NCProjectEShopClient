@@ -105,8 +105,11 @@ public class Product {
     }
 
     public float getAmount(int count) {
-        // todo:
         return ((float) Math.round(getPrice() * 100 * count)) / 100;
+    }
+
+    public float getPriceByRate(float rate) {
+        return ((float) Math.round( getPrice() * 100 / rate )) / 100;
     }
 
     @Override
