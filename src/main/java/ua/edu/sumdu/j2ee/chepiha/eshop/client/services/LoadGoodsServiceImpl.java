@@ -1,6 +1,7 @@
 package ua.edu.sumdu.j2ee.chepiha.eshop.client.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
 import ua.edu.sumdu.j2ee.chepiha.eshop.client.entities.xml.Goods;
 import ua.edu.sumdu.j2ee.chepiha.eshop.client.entities.xml.Product;
@@ -13,11 +14,11 @@ public class LoadGoodsServiceImpl implements LoadGoodsService {
 
     private static final LoggerMsgService logger = new LoggerMsgService(LoadGoodsServiceImpl.class) ;
 
-    private final LoadXMLService<Goods> loadXMLService;
+    private final ConversionService conversionService;
 
     @Autowired
-    public LoadGoodsServiceImpl(LoadXMLService<Goods> loadXMLService) {
-        this.loadXMLService = loadXMLService;
+    public LoadGoodsServiceImpl(ConversionService conversionService) {
+        this.conversionService = conversionService;
     }
 
     @Override
@@ -25,12 +26,7 @@ public class LoadGoodsServiceImpl implements LoadGoodsService {
         logger.msgInfo("load :: start...");
         Goods goods = new Goods();
         logger.msgDebug("load :: goods - " + goods);
-        goods = loadXMLService.convertStringXMLToObject(
-                LoadService.load( url ),
-                goods,
-                Goods.class,
-                Product.class
-        );
+        goods = conversionService.convert(LoadService.load( url ), Goods.class);
         logger.msgDebug("load :: loaded " + goods.size() + " rows");
         return goods;
     }

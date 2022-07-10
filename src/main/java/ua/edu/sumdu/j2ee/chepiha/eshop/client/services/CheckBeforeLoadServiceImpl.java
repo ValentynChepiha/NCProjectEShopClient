@@ -1,6 +1,7 @@
 package ua.edu.sumdu.j2ee.chepiha.eshop.client.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
 import ua.edu.sumdu.j2ee.chepiha.eshop.client.entities.db.CurrencyExchange;
 import ua.edu.sumdu.j2ee.chepiha.eshop.client.entities.xml.Currency;
@@ -9,7 +10,7 @@ import ua.edu.sumdu.j2ee.chepiha.eshop.client.interfaces.CheckBeforeLoadService;
 import ua.edu.sumdu.j2ee.chepiha.eshop.client.interfaces.LoadExchangeService;
 import ua.edu.sumdu.j2ee.chepiha.eshop.client.interfaces.ModelExchangeRepository;
 
-import java.text.ParseException;
+import java.sql.Date;
 
 @Service
 public class CheckBeforeLoadServiceImpl implements CheckBeforeLoadService {
@@ -18,14 +19,14 @@ public class CheckBeforeLoadServiceImpl implements CheckBeforeLoadService {
 
     private final ModelExchangeRepository<CurrencyExchange> currencyExchangeRepository;
     private final LoadExchangeService loadExchangeService;
-    private final LoadXMLService<Exchange> loadXMLService;
+    private final ConversionService conversionService;
 
     @Autowired
     public CheckBeforeLoadServiceImpl(ModelExchangeRepository<CurrencyExchange> currencyExchangeRepository,
-                                      LoadExchangeService loadExchangeService, LoadXMLService<Exchange> loadXMLService) {
+                                      LoadExchangeService loadExchangeService, ConversionService conversionService) {
         this.currencyExchangeRepository = currencyExchangeRepository;
         this.loadExchangeService = loadExchangeService;
-        this.loadXMLService = loadXMLService;
+        this.conversionService = conversionService;
     }
 
     @Override
@@ -34,13 +35,8 @@ public class CheckBeforeLoadServiceImpl implements CheckBeforeLoadService {
         if (currencyExchangeRepository.checkLastDateUpdate() > 0) {
             return;
         }
-
         Exchange exchange = new Exchange();
-        exchange = loadXMLService.convertStringXMLToObject(
-                loadExchangeService.loadCurrency(),
-                exchange,
-                Exchange.class,
-                Currency.class);
+        exchange = conversionService.convert(loadExchangeService.loadCurrency(), Exchange.class);
 
         logger.msgDebug("checkUpdateExchangeRate :: loaded " + exchange.size() + " rows");
         if(exchange.size()==0){
@@ -50,19 +46,14 @@ public class CheckBeforeLoadServiceImpl implements CheckBeforeLoadService {
         Exchange exchangeFiltered = loadExchangeService.filterListCurrency(exchange);
         logger.msgDebug("checkUpdateExchangeRate :: filtered " + exchangeFiltered.size() + " rows");
 
-        try {
-            for(Currency currency: exchangeFiltered.getCurrencies()) {
-                currencyExchangeRepository.create(
-                        new CurrencyExchange(
-                                currency.getR030(),
-                                currency.getRate(),
-                                ConvertStringToDate.parseStringToDate(currency.getExchangedate()))
-                );
-            }
-        } catch (ParseException e) {
-            e.printStackTrace();
+        for(Currency currency: exchangeFiltered.getCurrencies()) {
+            currencyExchangeRepository.create(
+                    new CurrencyExchange(
+                            currency.getR030(),
+                            currency.getRate(),
+                            conversionService.convert(currency.getExchangedate(), Date.class))
+            );
         }
     }
-
 
 }
